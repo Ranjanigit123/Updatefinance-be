@@ -14,11 +14,25 @@ const app = express();
 
 // Security middleware
 app.use(helmet());
+//app.use(cors({
+ // origin: process.env.NODE_ENV === 'production' ? 'http://updatefinance.netlify.app' : 'http://localhost:4200',
+  //credentials: true
+//}));
+const allowedOrigins = [
+  'http://localhost:4200',
+  'https://updatefinance.netlify.app'
+];
+
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? 'http://updatefinance.netlify.app' : 'http://localhost:4200',
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
- 
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
